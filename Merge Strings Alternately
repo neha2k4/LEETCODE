@@ -1,0 +1,31 @@
+class Solution {
+public:
+    string mergeAlternately(string word1, string word2) {
+        int m = word1.size();
+        int n = word2.size();
+        string ans = "";
+        int i = 0, j = 0;
+
+        // Merge characters alternately
+        while (i < m && j < n) {
+            ans += word1[i];
+            ans += word2[j];
+            i++;
+            j++;
+        }
+
+        // Append remaining characters from word1 (if any)
+        while (i < m) {
+            ans += word1[i];
+            i++;
+        }
+
+        // Append remaining characters from word2 (if any)
+        while (j < n) {
+            ans += word2[j];
+            j++;
+        }
+
+        return ans;
+    }
+};
