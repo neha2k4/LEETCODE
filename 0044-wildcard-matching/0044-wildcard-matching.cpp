@@ -1,29 +1,26 @@
 class Solution {
 public:
-    bool solve(int index1, int index2, string &text, string &pattern) {
-        if (index1 < 0 && index2 < 0) return true;
-        if (index2 < 0 && index1 >= 0) return false;
-        if (index1 < 0 && index2 >= 0) {
-            for (int i = 0; i <= index2; i++) {
-                if (pattern[i] != '*') return false;
-            }
-            return true;
-        }
-
-        if (text[index1] == pattern[index2] || pattern[index2] == '?') {
-            return solve(index1 - 1, index2 - 1, text, pattern);
-        }
-
-        if (pattern[index2] == '*') {
-            return solve(index1 - 1, index2, text, pattern) || solve(index1, index2 - 1, text, pattern);
-        }
-
-        return false;
-    }
-
     bool isMatch(string s, string p) {
-        int n1 = s.size();
-        int n2 = p.size();
-        return solve(n1-1, n2-1, s, p);
+        vector<bool> dp(p.size() + 1, false);
+        dp[0] = true;
+        for (int j = 0; j < p.size() && p[j] == '*'; ++j) {
+            dp[j + 1] = true;
+        }
+        
+        for (int i = 1; i <= s.size(); ++i) {
+            dp[0] = false;
+            bool neighborLastRow = i == 1;
+            for (int j = 1; j <= p.size(); ++j) {
+                bool currLastRow = dp[j];
+                if (p[j - 1] == '*') {
+                    dp[j] = currLastRow || dp[j - 1];
+                } else {
+                    dp[j] = (s[i - 1] == p[j - 1] || p[j - 1] == '?') && neighborLastRow;
+                }
+                neighborLastRow = currLastRow;
+            }
+        }
+
+        return dp[p.size()];
     }
 };
