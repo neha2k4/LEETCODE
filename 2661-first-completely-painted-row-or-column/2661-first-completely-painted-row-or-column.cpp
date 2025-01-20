@@ -1,49 +1,42 @@
 class Solution {
 public:
     int firstCompleteIndex(vector<int>& arr, vector<vector<int>>& mat) {
-        int numRows = mat.size(), numCols = mat[0].size();
-        unordered_map<int, pair<int, int>> numToPos;
-       
-        for (int row = 0; row < numRows; row++) {
-            for (int col = 0; col < numCols; col++) {
-                int value = mat[row][col];
-                numToPos[value] = {row, col};
-            }
-        }
-
+        // Map to store the index of each number in the arr
+        unordered_map<int, int> numToIndex;
         for (int i = 0; i < arr.size(); i++) {
-            int num = arr[i];
-            auto [row, col] = numToPos[num];
-            mat[row][col] = -mat[row][col];  // mark as seen
-
-            // Check if the row or column is completely painted
-            if (checkRow(row, mat) || checkColumn(col, mat)) {
-                return i;
-            }
+            numToIndex[arr[i]] = i;
         }
 
-        return -1;  // This line will never be reached as per the problem
-                    // statement
-    }
+        int result = INT_MAX;
+        int numRows = mat.size();
+        int numCols = mat[0].size();
 
-private:
-    bool checkRow(int row, vector<vector<int>>& mat) {
-        // Return true if row is completely seen
-        for (int col = 0; col < mat[0].size(); col++) {
-            if (mat[row][col] > 0) {
-                return false;
+        // Check for the earliest row to be completely painted
+        for (int row = 0; row < numRows; row++) {
+            // Tracks the greatest index in this column
+            int lastElementIndex = INT_MIN;
+            for (int col = 0; col < numCols; col++) {
+                int indexVal = numToIndex[mat[row][col]];
+                lastElementIndex = max(lastElementIndex, indexVal);
             }
+            // Update result with the minimum index where this row is fully
+            // painted
+            result = min(result, lastElementIndex);
         }
-        return true;
-    }
 
-    bool checkColumn(int col, vector<vector<int>>& mat) {
-        // Return true if col is completely seen
-        for (int row = 0; row < mat.size(); row++) {
-            if (mat[row][col] > 0) {
-                return false;
+        // Check for the earliest column to be completely painted
+        for (int col = 0; col < numCols; col++) {
+            // Tracks the greatest index in this column
+            int lastElementIndex = INT_MIN;
+            for (int row = 0; row < numRows; row++) {
+                int indexVal = numToIndex[mat[row][col]];
+                lastElementIndex = max(lastElementIndex, indexVal);
             }
+            // Update result with the minimum index where this column is fully
+            // painted
+            result = min(result, lastElementIndex);
         }
-        return true;
+
+        return result;
     }
 };
