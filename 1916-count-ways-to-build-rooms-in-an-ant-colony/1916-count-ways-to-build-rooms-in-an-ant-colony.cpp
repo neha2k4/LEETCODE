@@ -1,65 +1,46 @@
-const int mod = 1000000007;
 class Solution {
-    vector<int> subtreeCount; // Stores number of elements in subtree rooted at any node
-    vector<int> dp; // Stores answer for subtree rooted at any node
-    
-    struct BinomialCoefficients{
-        vector<int> fact, inverse;
-
-        BinomialCoefficients(int n){
-            fact = vector<int>(n+1, 1);
-            inverse = vector<int>(n+1, 1);
-            for(int i = 2 ; i <= n ; i++){
-                fact[i] = 1LL * fact[i-1] * i % mod;
-                inverse[i] = getPower(fact[i], mod-2);
-            }
-        }
-
-        int getPower(int x, int y){
-            int res = 1;
-            while(y){
-                if(y & 1) res = 1LL * res * x % mod;
-                y >>= 1;
-                x = 1LL * x * x % mod;
-            }
-            return res;
-        }
-        
-        inline int getNcr(int n, int r){
-            return (n >= r ? 1LL * fact[n] * inverse[r] % mod * inverse[n-r] % mod : 0); 
-        }
-    };
-    
-    BinomialCoefficients *binomial = NULL;
 public:
-    int waysToBuildRooms(vector<int>& prevRoom) {
-        int n = prevRoom.size();
-        subtreeCount = vector<int>(n, 0);
-        dp = vector<int>(n, 1);
-        binomial = new BinomialCoefficients(n);
-        
-        // Create and build tree
-        vector<int> g[n];
-        for(int i = 1 ; i < n ; i++) g[prevRoom[i]].emplace_back(i);
-        
-        dfs(g, 0);
-        return dp[0];
+    const long long mod = 1e9+7;
+     int binpow(int a,int b){
+        if(b==1) return a%mod;
+        else {
+            long long t = binpow(a,b/2);
+            t = (t*t%mod)%mod; if(b%2) t = (t*a)%mod;
+            return t;
+        }
+   }   
+    int dfs(vector<vector<int>> &nums,vector<long long> &fac,vector<long long> &inv,vector<long long> &dp,vector<int> &sub,int in,int p){
+        long long int re = 1, n = 0;
+        for(int i = 0; i<nums[in].size();++i){
+            n+=dfs(nums,fac,inv,dp,sub,nums[in][i],in);
+        }
+        sub[in] = n+1;
+        for(int i = 0; i<nums[in].size();++i){
+            int j = nums[in][i];
+            int r = sub[j];
+            re = (re*((fac[n]*inv[r])%mod*inv[n-r]%mod))%mod;
+            re = (re*dp[j])%mod;
+            n-=r;
+        }
+        dp[in] = re;
+        return sub[in];
     }
-    
-    void dfs(vector<int> g[], int node){
-        for(int i : g[node]){
-            dfs(g, i);
-            dp[node] = 1LL * dp[node] * dp[i] % mod;
-            subtreeCount[node] += subtreeCount[i];
-        }
+    int waysToBuildRooms(vector<int>& arr) {
+        int n = arr.size();
         
-        // Combinatorics part
-        int remainingNodes = subtreeCount[node];
-        for(int i : g[node]){
-            dp[node] = 1LL * dp[node] * binomial->getNcr(remainingNodes, subtreeCount[i]) % mod;
-            remainingNodes -= subtreeCount[i];
-        }
+        vector<long long> fac(n+1,1), in(n+1,1);
+        fac[0] = in[0] = 1;
+        for(int i=1;i<=n;i++) fac[i] = (i*fac[i-1])%mod;
+        in[n] = binpow(fac[n],mod-2);
+        for(int i=n-1;i>=0;i--) in[i] = (in[i+1]*(i+1))%mod;
         
-        subtreeCount[node]++; // Including current node in this subtree
+        vector<vector<int>> nums(n);
+        for(int i = 1; i<nums.size();++i) nums[arr[i]].push_back(i);
+        
+        vector<long long> dp(n+1,0);
+        vector<int> sub(n,0);
+        dfs(nums,fac,in,dp,sub,0,-1);
+        
+        return dp[0];
     }
 };
