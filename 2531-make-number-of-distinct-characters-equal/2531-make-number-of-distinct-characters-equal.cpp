@@ -1,53 +1,54 @@
 class Solution {
 public:
     bool isItPossible(string word1, string word2) {
-        
-        vector<int> vect1(26,0), vect2(26,0);//mapping vectors for word1 and word2 respectively
-        int count1=0,count2=0;
-        
-        for(int i=0;i<word1.length();i++){
-            if(vect1[word1[i]-'a']++ == 0)
-                count1++;
+        vector<int> f1(26, 0), f2(26, 0);
+        // Build frequency arrays for word1 and word2
+        for (char c : word1) {
+            f1[c - 'a']++;
         }
-        for(int i=0;i<word2.length();i++){
-            if(vect2[word2[i]-'a']++ == 0)
-                count2++;
+        for (char c : word2) {
+            f2[c - 'a']++;
         }
         
-        for(int i=0;i<26;i++){
-            //if value is zero means word1 does not consist that alphabet how we will swap then\U0001f937‍♂️. So continue for next iteration
-            if(vect1[i] == 0)
-                continue;
-
-            for(int j=0;j<26;j++){
-                if(vect2[j]==0)
-                    continue;
-
-                //swapped ith character of word1 with jth character of word2
-                if(--vect1[i] == 0)
-                    count1--;
-                if(++vect2[i] == 1)
-                    count2++;
-                if(--vect2[j] == 0)
-                    count2--;
-                if(++vect1[j] == 1)
-                    count1++;
-
-                if(count1 == count2)
-                    return true;//function returned if condition satisfied
-
-                //swap again to get original form as the last swap was invalid.
-                if(++vect2[j] == 1)
-                    count2++;
-                if(--vect1[j] == 0)
-                    count1--;
-                if(++vect1[i] == 1)
-                    count1++;
-                if(--vect2[i] == 0)
-                    count2--;
+        // Count the number of distinct letters in each word.
+        int d1 = 0, d2 = 0;
+        for (int i = 0; i < 26; i++) {
+            if (f1[i] > 0) d1++;
+            if (f2[i] > 0) d2++;
+        }
+        
+        // If the distinct counts are already equal,
+        // check if there is a common letter.
+        // Swapping a common letter with itself is a valid move.
+        if (d1 == d2) {
+            for (int i = 0; i < 26; i++) {
+                if (f1[i] > 0 && f2[i] > 0)
+                    return true;
             }
-            
         }
-        return false; //returned false if not condition satisfied till last iteration
+        
+        // Try all possible swaps of different letters.
+        for (int i = 0; i < 26; i++) {
+            for (int j = 0; j < 26; j++) {
+                if (i == j) continue; // Same letter swap is already handled.
+                if (f1[i] > 0 && f2[j] > 0) {  
+                    int x1 = d1, x2 = d2;
+                    
+                    // Simulate removal of letter i from word1.
+                    if (f1[i] == 1) x1--;
+                    // Simulate addition of letter i to word2.
+                    if (f2[i] == 0) x2++;
+                    
+                    // Simulate addition of letter j to word1.
+                    if (f1[j] == 0) x1++;
+                    // Simulate removal of letter j from word2.
+                    if (f2[j] == 1) x2--;
+                    
+                    if (x1 == x2)
+                        return true;
+                }
+            }
+        }
+        return false;
     }
 };
