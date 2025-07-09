@@ -1,30 +1,22 @@
 class Solution {
 public:
-    int maxFreeTime(int eventTime, int k, vector<int>& startTime, vector<int>& endTime) {
-        int n = startTime.size();
-
-        // Step 1: Build the gaps array
-        vector<int> gaps;
-        gaps.push_back(startTime[0]);
-        for (int i = 1; i < n; ++i) {
-            gaps.push_back(startTime[i] - endTime[i - 1]); 
+    int maxFreeTime(int eventTime, int k, vector<int>& s, vector<int>& e) {
+        int c=0;
+        vector<pair<int,int>>p;
+        for(int i=0;i<s.size();i++)p.push_back({s[i],e[i]});
+        sort(p.begin(),p.end());
+        vector<int>l;
+        for(int i=0;i<p.size();i++){
+            l.push_back(p[i].first-c);
+            c=p[i].second;
         }
-        gaps.push_back(eventTime - endTime.back()); 
-
-        // Step 2: Sliding window of size k+1 to get maximum sum of gaps
-        int windowSize = k + 1;
-        int maxSum = 0, currentSum = 0;
-
-        for (int i = 0; i < gaps.size(); i++) {
-            currentSum += gaps[i];
-            if (i >= windowSize) {
-                currentSum -= gaps[i - windowSize];
-            }
-            if (i >= windowSize - 1) {
-                maxSum = max(maxSum, currentSum);
-            }
+        l.push_back(eventTime-c);
+        int q=0,w=0,h=0,g=0;
+        for(int i=0;i<l.size();i++){
+          q+=l[i];g=max(g,q);
+          if(w==k)q-=l[h],h++,w--;
+          w++;
         }
-
-        return maxSum;
+        return g;
     }
 };
