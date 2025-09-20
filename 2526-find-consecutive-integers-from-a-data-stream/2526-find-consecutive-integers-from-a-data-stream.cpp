@@ -2,10 +2,12 @@ class DataStream {
     private:
         unsigned int size=0;
         int target,windowSize;
+      
 
 public:
     DataStream(int value, int k) {
         this->target=value;
+
         this->windowSize=k;
 
     }
@@ -14,6 +16,8 @@ public:
         if(num!=target) this->size=0;
         else ++this->size;
         return this->size >=windowSize;
+       
+
         
     }
 };
