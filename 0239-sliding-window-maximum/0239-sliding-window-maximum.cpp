@@ -1,9 +1,10 @@
 class Solution {
 public:
     vector<int> maxSlidingWindow(vector<int>& nums, int k) {
+
         int n = nums.size();
         vector<int> ans;
-        ans.reserve(n - k + 1);
+        
 
         deque<int> dq;
 
@@ -20,23 +21,21 @@ public:
             }
         }
         return ans;
-    }
-};
+ 
+        };
+    };
 
 
-// BruteForceApproach
-//  class Solution {
-//  public:
-//      vector<int> maxSlidingWindow(vector<int>& nums, int k) {
-//          int n = nums.size();
-//          list<int> st;
-//          for (int i = 0; i + k <= n; i++) {
-//              int maxi = nums[i];
-//              for (int j = i; j < i + k; j++) {
-//                  maxi = max(maxi, nums[j]);
-//              }
-//              st.push_back(maxi);
-//          }
-//          return vector<int>(st.begin(), st.end());
-//      }
-//  };
+
+
+
+
+
+
+
+
+
+
+
+
+
